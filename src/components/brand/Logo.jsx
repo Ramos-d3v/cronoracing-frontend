@@ -1,8 +1,10 @@
-export function Logo() {
+import logoImage from '../../assets/logo.jpeg'
+
+export function Logo({ className = '', imageClassName = 'h-12 w-12', secondaryClassName = '' }) {
   return (
-    <a className="logo" href="#top" aria-label="CronoRacing início">
-      <span className="logo-mark">CR</span>
-      <span>CRONO<span>RACING</span></span>
+    <a className={`logo flex items-center gap-3 !tracking-normal ${className}`} href="#top" aria-label="CronoRacing início">
+      <img className={`shrink-0 rounded-sm object-contain ${imageClassName}`} src={logoImage} alt="" />
+      <span className="whitespace-nowrap">CRONO<span className={secondaryClassName}>RACING</span></span>
     </a>
   )
 }
