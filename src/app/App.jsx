@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { BrowserRouter, Link, Navigate, Outlet, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { AuthPanel } from '../features/auth/components/AuthPanel'
 import { AdminShell } from '../features/admin/AdminShell'
 import { EventDetails } from '../features/public/EventDetails'
 import { ResultsPage } from '../features/public/ResultsPage'
 import { LandingPage } from '../features/landing/LandingPage'
+import { LoginPage } from '../features/auth/pages/LoginPage'
+import { RegisterPage } from '../features/auth/pages/RegisterPage'
 import { Logo } from '../components/brand/Logo'
 import { authApi } from '../services/api/client'
 
@@ -34,13 +35,14 @@ function AppRoutes() {
   const [session, setSession] = useState(storedAuth.session)
   const navigate = useNavigate()
   const location = useLocation()
-  const auth = location.pathname === '/login' ? 'login' : location.pathname === '/register' ? 'register' : null
 
   useEffect(() => {
     if (!session) return
-    authApi.me(session).then((data) => setUser(data.user || data)).catch((error) => {
-      if (error.status === 401) signOut()
-    })
+    let active = true
+    authApi.getCurrentUser(session)
+      .then((data) => active && setUser(data.user || data))
+      .catch((error) => { if (active && error.status === 401) signOut() })
+    return () => { active = false }
   }, [session])
 
   useEffect(() => {
@@ -48,9 +50,10 @@ function AppRoutes() {
   }, [location.pathname])
 
   function signIn(data) {
-    setSession(data.access_token)
+    const token = data.token || data.access_token
+    setSession(token)
     setUser(data.user)
-    window.localStorage.setItem('cronoracing.session', data.access_token)
+    window.localStorage.setItem('cronoracing.session', token)
     window.localStorage.setItem('cronoracing.user', JSON.stringify(data.user))
     navigate('/', { replace: true })
   }
@@ -69,9 +72,9 @@ function AppRoutes() {
   return (
     <div id="top" className="app-shell">
       <Routes>
-        <Route path="/" element={<LandingPage onAuth={openAuth} onEvent={(event) => navigate(`/eventos/${event.slug || event.id}`, { state: { event } })} />} />
-        <Route path="/login" element={<LandingPage onAuth={openAuth} onEvent={(event) => navigate(`/eventos/${event.slug || event.id}`, { state: { event } })} />} />
-        <Route path="/register" element={<LandingPage onAuth={openAuth} onEvent={(event) => navigate(`/eventos/${event.slug || event.id}`, { state: { event } })} />} />
+        <Route path="/" element={<LandingPage user={user} onLogout={signOut} onAuth={openAuth} onEvent={(event) => navigate(`/eventos/${event.slug || event.id}`, { state: { event } })} />} />
+        <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage onSuccess={signIn} />} />
+        <Route path="/register" element={user ? <Navigate to="/" replace /> : <RegisterPage onSuccess={signIn} />} />
         <Route element={<LegacyLayout user={user} onLogout={signOut} />}>
           <Route path="/eventos/:eventId" element={<EventDetailsRoute onAuth={openAuth} />} />
           <Route path="/resultados/:eventId" element={<ResultsRoute />} />
@@ -79,7 +82,6 @@ function AppRoutes() {
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-      {auth && <AuthPanel mode={auth} onClose={() => navigate('/')} onSuccess={signIn} onSwitch={() => openAuth(auth === 'login' ? 'register' : 'login')} />}
     </div>
   )
 }

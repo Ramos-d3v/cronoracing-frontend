@@ -7,7 +7,7 @@ import { Footer } from './components/Footer'
 import { Header } from './components/Header'
 import { HeroSection } from './components/HeroSection'
 
-export function LandingPage({ onAuth, onEvent }) {
+export function LandingPage({ onAuth, onEvent, user, onLogout }) {
   const [events, setEvents] = useState(upcomingRaces)
   const [requestNumber, setRequestNumber] = useState(0)
   const [status, setStatus] = useState({ loading: true, error: '' })
@@ -36,7 +36,7 @@ export function LandingPage({ onAuth, onEvent }) {
 
   return (
     <>
-      <Header onAuth={onAuth} />
+      <Header onAuth={onAuth} user={user} onLogout={onLogout} />
       <main>
         <HeroSection onAuth={onAuth} />
         <EventsGrid events={events} loading={status.loading} error={status.error} onRetry={retry} onEvent={onEvent} />
