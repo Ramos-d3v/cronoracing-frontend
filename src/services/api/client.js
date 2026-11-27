@@ -59,7 +59,10 @@ function withToken(token, options = {}) {
 }
 
 export const authApi = {
-  login: (payload) => apiRequest('/api/auth/login', { method: 'POST', body: JSON.stringify(payload) }),
+  loginAthlete: (credentials) => apiRequest('/api/auth/login', { method: 'POST', body: JSON.stringify(credentials) }),
+  registerAthlete: (payload) => apiRequest('/api/auth/register', { method: 'POST', body: JSON.stringify(payload) }),
+  getCurrentUser: (token) => apiRequest('/api/auth/me', withToken(token)),
+  login: (credentials) => apiRequest('/api/auth/login', { method: 'POST', body: JSON.stringify(credentials) }),
   register: (payload) => apiRequest('/api/auth/register', { method: 'POST', body: JSON.stringify(payload) }),
   me: (token) => apiRequest('/api/auth/me', withToken(token)),
 }

@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
+@layer components {
 :root { --ink:#171916; --paper:#f2f0e9; --lime:#d7ed62; --orange:#f26a3d; --line:rgba(23,25,22,.18); --muted:#73766c; }
 * { box-sizing:border-box; }
 html { scroll-behavior:smooth; }
@@ -112,4 +113,5 @@ h2 { font-size:clamp(52px,7vw,88px); line-height:.85; }
   .event-detail-grid { grid-template-columns:1fr; margin-top:35px; }
   .event-detail-grid aside { border-left:0; border-top:1px solid var(--line); padding-left:0; padding-top:30px; }
   .results-table { font-size:12px; }
+}
 }
